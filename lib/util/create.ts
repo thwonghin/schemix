@@ -17,16 +17,22 @@ export function createModel(
   param2?: (Model: PrismaModel) => void
 ): PrismaModel | undefined {
   if (!schema) throw Error("Schema was not initialized.");
-  
+
   if (typeof param1 === "string" && typeof param2 === "function") {
     const model = schema.createModel(param1);
-    setTimeout(param2, 0, model);
+    setTimeout((model) => {
+      param2(model);
+      schema?.applyModelMixins(model);
+     }, 0, model);
     return model;
-  } 
-  
+  }
+
   if (typeof param1 === "function" && !param2) {
     const model = schema.createModel(getCallerFileName());
-    setTimeout(param1, 0, model);
+    setTimeout((model) => {
+      param1(model);
+      schema?.applyModelMixins(model)
+    }, 0, model);
     return model;
   }
 }
@@ -45,13 +51,13 @@ export function createEnum(
   param2?: (Enum: PrismaEnum) => void
 ): PrismaEnum | undefined {
   if (!schema) throw Error("Schema was not initialized.");
-  
+
   if (typeof param1 === "string" && typeof param2 === "function") {
     const model = schema.createEnum(param1);
     setTimeout(param2, 0, model);
     return model;
-  } 
-  
+  }
+
   if (typeof param1 === "function" && !param2) {
     const model = schema.createEnum(getCallerFileName());
     setTimeout(param1, 0, model);

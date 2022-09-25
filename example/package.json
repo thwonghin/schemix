@@ -10,6 +10,8 @@
   "license": "ISC",
   "dependencies": {
     "schemix": "^1.1.4",
+    "snake-case": "^3.0.4",
     "ts-node": "^10.7.0"
-  }
+  },
+  "devDependencies": {}
 }

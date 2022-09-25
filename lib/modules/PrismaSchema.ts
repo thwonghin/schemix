@@ -10,10 +10,14 @@ import {
   PrismaMultiGeneratorOptions,
 } from "@/@types/prisma-generator";
 import { importAllFiles } from "@/util/import";
+import { createMixin } from "..";
+
+type ModelMixin = ReturnType<typeof createMixin>
 
 export class PrismaSchema {
   private enums: Map<string, PrismaEnum> = new Map();
   private models: Map<string, PrismaModel> = new Map();
+  private modelMixins: ModelMixin[] = [];
 
   constructor(
     private readonly basePath: string,
@@ -86,6 +90,17 @@ export class PrismaSchema {
     const prismaEnum = new PrismaEnum(enumName);
     this.enums.set(enumName, prismaEnum);
     return prismaEnum;
+  }
+
+  public addModelMixin(modelMixin: ModelMixin) {
+    this.modelMixins.push(modelMixin);
+    return this;
+  }
+
+  public applyModelMixins(model: PrismaModel) {
+    this.modelMixins.forEach((modelMixin) => {
+      model.mixin(modelMixin);
+    })
   }
 
   /**

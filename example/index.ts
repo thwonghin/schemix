@@ -9,12 +9,15 @@ createSchema({
   generator: [
     {
       name: "client",
-      provider: "prisma-client-js"
+      provider: "prisma-client-js",
     },
     {
       name: "prismaThirdPartyGenerator",
       provider: "prisma-includes-generator",
-      seperateRelationFields: true
-    }
+      seperateRelationFields: true,
+    },
   ],
-}).export(__dirname, "schema");
+})
+  .addModelMixin(require("./mixins/DateTime.mixin").default)
+  .addModelMixin(require("./mixins/SnakeCase.mixin").default)
+  .export(__dirname, "schema");

@@ -168,6 +168,8 @@ export type CompositeIDFieldOptions = {
   map?: string;
 };
 
-export type ModelMapOptions = {
-  name: string;
-} | string;
+export type ModelMapOptions =
+  | {
+      name: string;
+    }
+  | string;

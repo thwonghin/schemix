@@ -30,13 +30,15 @@ import {
 } from "@/@types/prisma-type-options";
 import { PrismaEnumOptions } from "@/@types/prisma-enum";
 
+type PrismaField = PrismaScalarField | PrismaRelationalField | PrismaEnumField;
+
+type FieldMixin = (fieldName: string, field: PrismaField) => void;
+
 export class PrismaModel {
-  private fields: Map<
-    string,
-    PrismaScalarField | PrismaRelationalField | PrismaEnumField
-  > = new Map();
+  private fields: Map<string, PrismaField> = new Map();
   private blockAttributes: string[] = [];
   private rawFields: string[] = [];
+  private fieldMixins: FieldMixin[] = [];
 
   constructor(
     private readonly schema: PrismaSchema,
@@ -113,6 +115,7 @@ export class PrismaModel {
     [...model.fields.entries()].map(([key, value]) =>
       this.fields.set(key, value)
     );
+    this.fieldMixins.push(...model.fieldMixins);
     return this;
   }
 
@@ -127,6 +130,10 @@ export class PrismaModel {
     clone.fields = this.fields;
     clone.rawFields = this.rawFields;
     return clone;
+  }
+
+  public addFieldMixin(fieldMixin: FieldMixin) {
+    this.fieldMixins.push(fieldMixin);
   }
 
   public toString() {
@@ -167,7 +174,14 @@ export class PrismaModel {
     return this;
   }
 
+  private applyFieldMixins() {
+    [...this.fields.entries()].forEach(([name, field]) => {
+      this.fieldMixins.forEach((fieldMixin) => fieldMixin(name, field));
+    });
+  }
+
   private parseFields() {
+    this.applyFieldMixins();
     const fields = [...this.fields.values()].map((field) =>
       field.toTokenArray()
     );

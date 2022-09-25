@@ -1,7 +1,6 @@
 import {
   PrismaFieldAttribute,
   PrismaFieldModifier,
-  PrismaFieldTypeName,
 } from "@/@types/prisma-field";
 
 export class PrismaEnumField {
@@ -11,7 +10,7 @@ export class PrismaEnumField {
 
   constructor(
     private readonly name: string,
-    private type: PrismaFieldTypeName
+    private type: string
   ) {}
 
   public setOptional() {
